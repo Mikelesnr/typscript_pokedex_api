@@ -5,8 +5,8 @@ export interface Pokemon {
   abilities: Ability[];
   forms: Form[];
   sprites: Sprites;
-  types: Type[];
   moves: Move[];
+  types: Type[];
 }
 
 export interface Ability {
@@ -30,15 +30,15 @@ export interface Sprites {
   };
 }
 
-export interface Type {
-  type: {
+export interface Move {
+  move: {
     name: string;
     url: string;
   };
 }
 
-export interface Move {
-  move: {
+export interface Type {
+  type: {
     name: string;
     url: string;
   };
