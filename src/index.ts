@@ -35,7 +35,7 @@ app.get("/pokemon/:name", async (req: Request, res: Response) => {
   } catch (error) {
     // Handle any errors that occur during the data fetching process
     const customError: CustomError = new Error(
-      "Error fetching data from PokeAPI"
+      "Pokemone does not exist in our database please check spelling or try another one"
     );
     customError.status = 500; // Set the status code to 500
     res.status(customError.status).send(customError.message); // Send the error message as the response

@@ -1,0 +1,167 @@
+Video Script
+[Opening Scene]
+
+Narrator: "Hello everyone! Welcome to this demonstration of our TypeScript Pokedex API project. Today, I'll walk you through the different files in our project and show you how they work together to fetch Pokémon data."
+
+[Scene 1: Overview]
+
+Narrator: "Let's start with a brief overview of the project. Our goal is to create a Pokedex API using TypeScript, Express, and Axios. We'll have two main components: an Express server that provides an API to fetch Pokémon data by name, and a script that uses recursion to fetch data for multiple Pokémon and outputs it to the terminal."
+
+[Scene 2: index.ts]
+
+Narrator: "First, let's take a look at the index.ts file. This file sets up our Express server and defines routes to fetch Pokémon data."
+
+typescript
+import express, { Request, Response } from "express";
+import axios from "axios";
+import { Pokemon } from "./types";
+
+const app = express();
+const port = 3000;
+
+app.get("/", (req: Request, res: Response) => {
+  res.send("Welcome to the Pokedex API!");
+});
+
+app.get("/pokemon/:name", async (req: Request, res: Response) => {
+  const { name } = req.params;
+  try {
+    const response = await axios.get<Pokemon>(`https://pokeapi.co/api/v2/pokemon/${name}`);
+    const pokemon: Pokemon = response.data;
+
+    const result = {
+      name: pokemon.name,
+      height: pokemon.height,
+      weight: pokemon.weight,
+      abilities: pokemon.abilities.map(ability => ability.ability.name),
+      forms: pokemon.forms.map(form => form.name),
+      imageUrl: pokemon.sprites.other["official-artwork"].front_default,
+      moves: pokemon.moves.map(move => move.move.name),
+      types: pokemon.types.map(type => type.type.name),
+    };
+
+    res.json(result);
+  } catch (error) {
+    const customError: CustomError = new Error("Error fetching data from PokeAPI");
+    customError.status = 500;
+    res.status(customError.status).send(customError.message);
+  }
+});
+
+app.listen(port, () => {
+  console.log(`Server is running on http://localhost:${port}`);
+});
+
+interface CustomError extends Error {
+  status?: number;
+}
+Narrator: "In this file, we import the necessary modules and set up an Express server. We define a route for the root URL that sends a welcome message and another route to fetch Pokémon data by name. The server listens on port 3000."
+
+[Scene 3: types.ts]
+
+Narrator: "Next, let's look at the types.ts file. This file defines the TypeScript interfaces for the Pokémon data structure."
+
+typescript
+export interface Pokemon {
+  name: string;
+  height: number;
+  weight: number;
+  abilities: Ability[];
+  forms: Form[];
+  sprites: Sprites;
+  moves: Move[];
+  types: Type[];
+}
+
+export interface Ability {
+  ability: {
+    name: string;
+    url: string;
+  };
+}
+
+export interface Form {
+  name: string;
+  url: string;
+}
+
+export interface Sprites {
+  front_default: string;
+  other: {
+    "official-artwork": {
+      front_default: string;
+    };
+  };
+}
+
+export interface Move {
+  move: {
+    name: string;
+    url: string;
+  };
+}
+
+export interface Type {
+  type: {
+    name: string;
+    url: string;
+  };
+}
+Narrator: "These interfaces define the structure of the Pokémon data, including properties like name, height, weight, abilities, forms, sprites, moves, and types."
+
+[Scene 4: fetchPokemon.ts]
+
+Narrator: "Now, let's move on to the fetchPokemon.ts file. This file contains a list of 20 Pokémon names and uses recursion to fetch data for each Pokémon from our local API."
+
+typescript
+import axios from "axios";
+import { Pokemon } from "./types";
+
+const pokemonNames = [
+  "bulbasaur", "ivysaur", "venusaur", "charmander", "charmeleon",
+  "charizard", "squirtle", "wartortle", "blastoise", "caterpie",
+  "metapod", "butterfree", "weedle", "kakuna", "beedrill",
+  "pidgey", "pidgeotto", "pidgeot", "rattata", "raticate"
+];
+
+async function fetchPokemonByName(name: string): Promise<Pokemon> {
+  const response = await axios.get<Pokemon>(`http://localhost:3000/pokemon/${name}`);
+  return response.data;
+}
+
+async function fetchMultiplePokemon(names: string[], index: number, result: Pokemon[]): Promise<Pokemon[]> {
+  if (index >= names.length) return result;
+  try {
+    const pokemon = await fetchPokemonByName(names[index]);
+    result.push(pokemon);
+    console.log(`Fetched data for ${names[index]}`);
+    return fetchMultiplePokemon(names, index + 1, result);
+  } catch (error) {
+    console.error(`Error fetching data for ${names[index]}:`, error);
+    return fetchMultiplePokemon(names, index + 1, result);
+  }
+}
+
+async function startFetchingPokemon() {
+  const pokemonData = await fetchMultiplePokemon(pokemonNames, 0, []);
+  console.log(pokemonData);
+}
+
+startFetchingPokemon();
+Narrator: "In this file, we define a list of 20 Pokémon names and a function to fetch Pokémon data by name from our local API. We use a recursive function to loop through the list and fetch data for each Pokémon. The fetched data is then logged to the terminal."
+
+[Scene 5: Demo]
+
+Narrator: "Now, let's see the project in action. First, we'll start the Express server by running the index.ts file."
+
+bash
+ts-node index.ts
+Narrator: "The server is now running on http://localhost:3000. Next, we'll run the fetchPokemon.ts file to fetch data for the list of 20 Pokémon."
+
+bash
+ts-node fetchPokemon.ts
+Narrator: "As you can see, the data for each Pokémon is fetched and logged to the terminal. This demonstrates how we can use TypeScript, Express, and Axios to create a Pokedex API and fetch Pokémon data."
+
+[Closing Scene]
+
+Narrator: "Thank you for watching this demonstration. I hope you found it helpful and informative. If you have any questions or feedback, feel free to reach out. Happy coding!"

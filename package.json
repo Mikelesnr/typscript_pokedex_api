@@ -13,6 +13,7 @@
   "description": "",
   "dependencies": {
     "axios": "^1.7.9",
+    "epress": "^0.0.1-security",
     "express": "^4.21.2"
   },
   "devDependencies": {
